@@ -242,7 +242,7 @@ class Profile(ViewSet):
             """
 
             try:
-                open_order = Order.objects.get(customer=current_user)
+                open_order = Order.objects.get(customer=current_user, payment_type__isnull=True)
                 print(open_order)
             except Order.DoesNotExist as ex:
                 open_order = Order()
@@ -251,7 +251,7 @@ class Profile(ViewSet):
                 open_order.save()
 
             line_item = OrderProduct()
-            line_item.product = Product.objects.get(pk=request.data["product_id"])
+            line_item.product = Product.objects.get(pk=request.data["id"])
             line_item.order = open_order
             line_item.save()
 
