@@ -33,7 +33,7 @@ class Cart(ViewSet):
             open_order.save()
 
         line_item = OrderProduct()
-        line_item.product = Product.objects.get(pk=request.data["product_id"])
+        line_item.product = Product.objects.get(pk=request.data["id"])
         line_item.order = open_order
         line_item.save()
 
