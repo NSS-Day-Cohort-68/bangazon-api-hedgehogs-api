@@ -24,4 +24,4 @@ class Order(models.Model):
         """
         line_items = self.lineitems.all()
         total = sum(item.product.price for item in line_items)
-        return total
+        return round(total, 2)
