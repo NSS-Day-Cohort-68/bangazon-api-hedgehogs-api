@@ -8,14 +8,19 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
+from django.core.exceptions import ValidationError
 from rest_framework import status
 from bangazonapi.models import Product, Customer, ProductCategory
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.validators import MaxValueValidator
+
+
 
 
 class ProductSerializer(serializers.ModelSerializer):
     """JSON serializer for products"""
+    price = serializers.FloatField(validators=[MaxValueValidator(17500.00, message="Price too high, please set a lower value")])
 
     class Meta:
         model = Product
@@ -97,12 +102,21 @@ class Products(ViewSet):
                 }
             }
         """
+        
         new_product = Product()
         new_product.name = request.data["name"]
-        new_product.price = request.data["price"]
+        try:
+            price = float(request.data["price"])
+            validator = MaxValueValidator(17500, message="Price too high, please set a lower value")
+            validator(price)
+        except ValidationError as e:
+            return Response({'error': e.messages}, status=status.HTTP_400_BAD_REQUEST)
+        new_product.price = price
         new_product.description = request.data["description"]
         new_product.quantity = request.data["quantity"]
         new_product.location = request.data["location"]
+
+    
 
         customer = Customer.objects.get(user=request.auth.user)
         new_product.customer = customer
@@ -119,6 +133,8 @@ class Products(ViewSet):
             )
 
             new_product.image_path = data
+        else:
+            pass
 
         new_product.save()
 
@@ -267,6 +283,7 @@ class Products(ViewSet):
         order = self.request.query_params.get("order_by", None)
         direction = self.request.query_params.get("direction", None)
         number_sold = self.request.query_params.get("number_sold", None)
+        location = self.request.query_params.get("location", None)
         min_price = self.request.query_params.get("min_price")
 
         if order is not None:
@@ -292,6 +309,9 @@ class Products(ViewSet):
                 return False
 
             products = filter(sold_filter, products)
+        
+        if location is not None:
+            products = products.filter(location=location)  # Filter by location
 
         if min_price is not None:
             products = products.filter(price__gte=min_price)
