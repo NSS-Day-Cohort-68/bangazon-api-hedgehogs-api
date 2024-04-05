@@ -108,7 +108,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 
 # Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 AUTH_PASSWORD_VALIDATORS = [
     {
