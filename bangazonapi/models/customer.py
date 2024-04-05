@@ -9,7 +9,7 @@ class Customer(models.Model):
     address = models.CharField(max_length=55)
 
     @property
-    def recommends(self):
+    def recommends(self):           
         return self.__recommends
 
     @recommends.setter
