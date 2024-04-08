@@ -139,10 +139,6 @@ class Cart(ViewSet):
                 open_order, many=False, context={"request": request}
             )
 
-            product_list = ProductSerializer(
-                products_on_order, many=True, context={"request": request}
-            )
-
             final = {"order": serialized_order.data}
             final["order"]["size"] = len(products_on_order)
 
