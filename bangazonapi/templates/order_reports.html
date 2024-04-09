@@ -14,10 +14,12 @@
 
         <h3>Customer Name:</h3>
         <li>{{item.customer.user.first_name}} {{item.customer.user.last_name}}</li>
-
+        {% if item.payment_type != null %}
         <h3>Payment Type</h3>
         <li>Merchant Name: {{ item.payment_type.merchant_name }} {{ item.payment_type.obscured_num }}</li>
+        {% endif %}
         </div>
+
         {% endfor %}
     </ul>
 </body>

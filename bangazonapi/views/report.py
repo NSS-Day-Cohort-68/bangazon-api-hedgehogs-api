@@ -20,9 +20,15 @@ class Reports(ViewSet):
                 "heading": "Orders that include a payment type that is not null",
                 "content": completed_orders,
             }
-            return render(request, "reports.html", context)
+            return render(request, "order_reports.html", context)
         if orderstatus == "incomplete":
-            pass
+            incomplete_orders = Order.objects.filter(payment_type__isnull=True)
+            context = {
+                "title": "Incomplete Orders",
+                "heading": "Orders that include a payment type that is null",
+                "content": incomplete_orders,
+            }
+            return render(request, "order_reports.html", context)
         else:
             return Response("", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
