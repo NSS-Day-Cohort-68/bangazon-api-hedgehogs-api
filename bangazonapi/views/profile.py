@@ -12,7 +12,8 @@ from bangazonapi.models import Order, Customer, Product
 from bangazonapi.models import OrderProduct, Favorite
 from bangazonapi.models import Recommendation
 from .product import ProductSerializer
-from .order import OrderSerializer
+
+# from .order import OrderSerializer
 
 
 class Profile(ViewSet):
