@@ -16,11 +16,16 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.validators import MaxValueValidator
 
 
-
-
 class ProductSerializer(serializers.ModelSerializer):
     """JSON serializer for products"""
-    price = serializers.FloatField(validators=[MaxValueValidator(17500.00, message="Price too high, please set a lower value")])
+
+    price = serializers.FloatField(
+        validators=[
+            MaxValueValidator(
+                17500.00, message="Price too high, please set a lower value"
+            )
+        ]
+    )
 
     class Meta:
         model = Product
@@ -102,21 +107,21 @@ class Products(ViewSet):
                 }
             }
         """
-        
+
         new_product = Product()
         new_product.name = request.data["name"]
         try:
             price = float(request.data["price"])
-            validator = MaxValueValidator(17500, message="Price too high, please set a lower value")
+            validator = MaxValueValidator(
+                17500, message="Price too high, please set a lower value"
+            )
             validator(price)
         except ValidationError as e:
-            return Response({'error': e.messages}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": e.messages}, status=status.HTTP_400_BAD_REQUEST)
         new_product.price = price
         new_product.description = request.data["description"]
         new_product.quantity = request.data["quantity"]
         new_product.location = request.data["location"]
-
-    
 
         customer = Customer.objects.get(user=request.auth.user)
         new_product.customer = customer
@@ -308,7 +313,7 @@ class Products(ViewSet):
                 return False
 
             products = filter(sold_filter, products)
-        
+
         if location is not None:
             products = products.filter(location=location)  # Filter by location
 
