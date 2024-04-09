@@ -6,7 +6,7 @@ from rest_framework import status
 from django.shortcuts import render
 from bangazonapi.models import Order
 from rest_framework.decorators import action
-
+from bangazonapi.models import Product
 
 class Reports(ViewSet):
     @action(detail=False, methods=["get"])
@@ -33,5 +33,23 @@ class Reports(ViewSet):
             return Response("", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=["get"])
-    def products(self, request):
-        pass
+    def expensiveproducts(self, request):
+        
+        expensiveproducts = Product.objects.filter(price__gte=1000)
+        context = {
+            "title": "Expensive Products",
+            "heading": "Products that are greater than or equal to $1000",
+            "content": expensiveproducts,
+        }
+        return render(request, "products.html", context)
+    
+    @action(detail=False, methods=["get"])
+    def inexpensiveproducts(self, request):
+        
+        inexpensiveproducts = Product.objects.filter(price__lte=999)
+        context = {
+            "title": "Inexpensive Products",
+            "heading": "Products that are less than or equal to $1000",
+            "content": inexpensiveproducts,
+        }
+        return render(request, "products.html", context)
