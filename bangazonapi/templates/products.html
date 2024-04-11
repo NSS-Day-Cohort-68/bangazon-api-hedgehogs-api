@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ heading }}</h1>
+    <ul>
+        {% for item in content %}
+        <div>
+        
+        <h3>Product # {{ item.id }}</h3>
+
+        <h3>Product Name:</h3>
+        <li>{{item.name}}</li>
+        
+        <h3>Product Price:</h3>
+        <li>{{item.price}}</li>
+
+        <h3>Quantity:</h3>
+        <li>{{item.quantity}}</li>
+
+        <h3>Seller:</h3>
+        <li>{{item.customer.user.first_name}} {{item.customer.user.last_name}}</li>
+        
+        </div>
+
+        {% endfor %}
+    </ul>
+</body>
+</html>
