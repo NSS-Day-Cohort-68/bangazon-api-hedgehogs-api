@@ -8,4 +8,4 @@ class Store(models.Model):
     )
     name = models.CharField(max_length=155)
     description = models.CharField(max_length=155)
-    create_date = models.DateField(auto_now_add=True)
+    created_date = models.DateField(auto_now_add=True)
