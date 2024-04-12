@@ -168,3 +168,42 @@ class Stores(ViewSet):
                 {"An unexpected error occurred": ex.args[0]},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+    def update(self, request, pk=None):
+        """
+        @api {PUT} /stores/:id PUT edit store data
+        @apiName EditStore
+        @apiGroup Store
+
+        @apiHeader {String} Authorization Auth token
+        @apiHeaderExample {String} Authorization
+            Token 9ba45f09651c5b0c404f37a2d2572c026c146611
+
+        @apiParam {String} name Short form name of store
+        @apiParam {String} description Long form description of store
+            {
+                "name": "Papa's General Store",
+                "description": "tools and socks"
+            }
+
+        @apiSuccessExample {json} Success
+            HTTP/1.1 204 No Content
+        """
+        try:
+            store = Store.objects.get(pk=pk)
+        except Store.DoesNotExist:
+            return Response(
+                {"message": "This store does not exist o.o"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Check if the user is the owner of the store
+        if store.seller.user != request.auth.user:
+            raise PermissionDenied("Smile! You're on camera! This is not your store!")
+
+        # Update store data based on request data
+        store.name = request.data.get("name", store.name)
+        store.description = request.data.get("description", store.description)
+        store.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
