@@ -25,6 +25,30 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
 
 class Stores(ViewSet):
     def retrieve(self, request, pk=None):
+        """
+        @api {GET} /stores/:id GET store matching primary key
+        @apiName GetStore
+        @apiGroup Store
+
+        @apiHeader {String} Authorization Auth token
+        @apiHeaderExample {String} Authorization
+            Token 9ba45f09651c5b0c404f37a2d2572c026c146611
+
+        @apiSuccess (200) {id} store.id Store Id
+        @apiSuccess (200) {String} store.name Short form name of store
+        @apiSuccess (200) {String} store.description Long form description of store
+        @apiSuccess (200) {Number} store.seller Customer id of the user creating the store
+        @apiSuccess (200) {Date} store.created_date Date store was created
+        @apiSuccessExample {json} Success
+            {
+                "id": 1,
+                "url": "http://localhost:8000/stores/1",
+                "name": "Papa's General Store",
+                "description": "tools and socks",
+                "created_date": "2020-10-23",
+                "seller": "http://localhost:8000/customers/5"
+            }
+        """
         try:
             store = Store.objects.get(pk=pk)
             serializer = StoreSerializer(store, context={"request": request})
@@ -32,11 +56,35 @@ class Stores(ViewSet):
 
         except Store.DoesNotExist:
             return Response(
-                {"message": "The requested store does not exist."},
+                {"message": "The requested store does not exist. Kinda spooky..."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
     def list(self, request):
+        """
+        @api {GET} /stores GET all stores
+        @apiName GetStores
+        @apiGroup Store
+
+        @apiHeader {String} Authorization Auth token
+        @apiHeaderExample {String} Authorization
+            Token 9ba45f09651c5b0c404f37a2d2572c026c146611
+
+        @apiSuccess (200) {id} store.id Store Id
+        @apiSuccess (200) {String} store.name Short form name of store
+        @apiSuccess (200) {String} store.description Long form description of store
+        @apiSuccess (200) {Number} store.seller Customer id of the user creating the store
+        @apiSuccess (200) {Date} store.created_date Date store was created
+        @apiSuccessExample {json} Success
+            {
+                "id": 1,
+                "url": "http://localhost:8000/stores/1",
+                "name": "Papa's General Store",
+                "description": "tools and socks",
+                "created_date": "2020-10-23",
+                "seller": "http://localhost:8000/customers/5"
+            }
+        """
         store = Store.objects.all()
         serializer = StoreSerializer(store, context={"request": request}, many=True)
         return Response(serializer.data)
@@ -75,7 +123,7 @@ class Stores(ViewSet):
             }
         """
         # Check if user currently has a store
-        existing_store = Store.objects.filter(seller__user=request.auth.user).first()
+        existing_store = Store.objects.filter(seller__user=request.auth.user)
         if existing_store:
             raise PermissionDenied("Aw nuts! You already have a store!")
 
@@ -91,11 +139,23 @@ class Stores(ViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
+        """
+        @api {DELETE} /stores/:id DELETE store matching id
+        @apiName RemoveStore
+        @apiGroup Store
+
+        @apiParam {id} id Store Id to be deleted
+        @apiSuccessExample {json} Success
+            HTTP/1.1 204 No Content
+        """
         try:
             store = Store.objects.get(pk=pk)
             store.delete()
 
-            return Response({}, status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                "Your store was successfully destroyed!",
+                status=status.HTTP_204_NO_CONTENT,
+            )
 
         except Store.DoesNotExist as ex:
             return Response(
@@ -105,5 +165,6 @@ class Stores(ViewSet):
 
         except Exception as ex:
             return Response(
-                {"message": ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"An unexpected error occurred": ex.args[0]},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
