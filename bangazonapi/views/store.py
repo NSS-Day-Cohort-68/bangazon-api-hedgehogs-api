@@ -5,10 +5,27 @@ from rest_framework import serializers
 from rest_framework import status
 from bangazonapi.models import Store, Customer
 from rest_framework.exceptions import PermissionDenied
+from .user import UserSerializer
+
+
+class SellerSerializer(serializers.HyperlinkedModelSerializer):
+    """JSON serializer for sellers"""
+
+    user = UserSerializer(many=False)
+
+    class Meta:
+        model = Customer
+        url = serializers.HyperlinkedIdentityField(
+            view_name="customer", lookup_field="id"
+        )
+        fields = ("id", "url", "user", "phone_number", "address")
+        depth = 1
 
 
 class StoreSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for stores"""
+
+    seller = SellerSerializer(many=False)
 
     class Meta:
         model = Store
