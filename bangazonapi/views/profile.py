@@ -88,6 +88,9 @@ class Profile(ViewSet):
             current_user.recommends = Recommendation.objects.filter(
                 recommender=current_user
             )
+            current_user.recommended_by = Recommendation.objects.filter(
+                customer=current_user
+            )
 
             serializer = ProfileSerializer(
                 current_user, many=False, context={"request": request}
@@ -152,6 +155,7 @@ class Profile(ViewSet):
             favorites, many=True, context={"request": request}
         )
         return Response(serializer.data)
+    
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -188,6 +192,8 @@ class ProfileProductSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+            "price",
+            "image_path",
         )
 
 
@@ -205,6 +211,9 @@ class RecommenderSerializer(serializers.ModelSerializer):
         )
 
 
+
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     """JSON serializer for customer profile
 
@@ -214,6 +223,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(many=False)
     recommends = RecommenderSerializer(many=True)
+    recommended_by = RecommenderSerializer(many=True)
 
     class Meta:
         model = Customer
@@ -225,6 +235,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "address",
             "payment_types",
             "recommends",
+            "recommended_by",
         )
         depth = 1
 
