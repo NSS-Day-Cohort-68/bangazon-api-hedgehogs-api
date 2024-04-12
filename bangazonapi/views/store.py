@@ -35,6 +35,11 @@ class Stores(ViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+    def list(self, request):
+        store = Store.objects.all()
+        serializer = StoreSerializer(store, context={"request": request}, many=True)
+        return Response(serializer.data)
+
     def create(self, request):
         """
         @api {POST} /stores POST new store
