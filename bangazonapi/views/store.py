@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from bangazonapi.models import Store, Customer
+from rest_framework.exceptions import PermissionDenied
 
 
 class StoreSerializer(serializers.HyperlinkedModelSerializer):
@@ -73,6 +74,12 @@ class Stores(ViewSet):
                 "seller": "http://localhost:8000/customers/5"
             }
         """
+        # Check if user currently has a store
+        existing_store = Store.objects.filter(seller__user=request.auth.user).first()
+        if existing_store:
+            raise PermissionDenied("Aw nuts! You already have a store!")
+
+        # If the user doesn't have a store, create a new store
         new_store = Store()
         new_store.name = request.data["name"]
         new_store.description = request.data["description"]
