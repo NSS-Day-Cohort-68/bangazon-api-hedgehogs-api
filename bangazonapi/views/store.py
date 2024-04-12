@@ -1,8 +1,9 @@
 from rest_framework.viewsets import ViewSet
+from django.http import HttpResponseServerError
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from bangazonapi.models import Store
+from bangazonapi.models import Store, Customer
 
 
 class StoreSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,6 +23,18 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class Stores(ViewSet):
+    def retrieve(self, request, pk=None):
+        try:
+            store = Store.objects.get(pk=pk)
+            serializer = StoreSerializer(store, context={"request": request})
+            return Response(serializer.data)
+
+        except Store.DoesNotExist:
+            return Response(
+                {"message": "The requested store does not exist."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
     def create(self, request):
         """
         @api {POST} /stores POST new store
@@ -55,3 +68,12 @@ class Stores(ViewSet):
                 "seller": "http://localhost:8000/customers/5"
             }
         """
+        new_store = Store()
+        new_store.name = request.data["name"]
+        new_store.description = request.data["description"]
+        customer = Customer.objects.get(user=request.auth.user)
+        new_store.seller = customer
+        new_store.save()
+
+        serializer = StoreSerializer(new_store, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
