@@ -202,6 +202,8 @@ class Stores(ViewSet):
             raise PermissionDenied("Smile! You're on camera! This is not your store!")
 
         # Update store data based on request data
+        # If the key "name" exists in the request.data, its value is returned.
+        # If not, it returns the default value, which is store.name.
         store.name = request.data.get("name", store.name)
         store.description = request.data.get("description", store.description)
         store.save()
