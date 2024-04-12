@@ -5,7 +5,20 @@ from rest_framework import serializers
 from rest_framework import status
 from bangazonapi.models import Store, Customer
 from rest_framework.exceptions import PermissionDenied
-from .user import UserSerializer
+from django.contrib.auth.models import User
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    """JSON serializer for Users
+
+    Arguments:
+        serializers
+    """
+
+    class Meta:
+        model = User
+        url = serializers.HyperlinkedIdentityField(view_name="user", lookup_field="id")
+        fields = ("id", "url", "username", "first_name", "last_name")
 
 
 class SellerSerializer(serializers.HyperlinkedModelSerializer):
