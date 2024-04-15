@@ -3,7 +3,7 @@ from django.http import HttpResponseServerError
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from bangazonapi.models import Store, Customer
+from bangazonapi.models import Store, Customer, Product
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from .product import ProductSerializer
