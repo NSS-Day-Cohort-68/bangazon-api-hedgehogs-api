@@ -1,6 +1,5 @@
 """View module for handling requests about customer order"""
 
-import datetime
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
