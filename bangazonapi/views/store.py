@@ -40,24 +40,6 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for stores"""
 
     seller = SellerSerializer(many=False)
-
-    class Meta:
-        model = Store
-        url = serializers.HyperlinkedIdentityField(view_name="store", lookup_field="id")
-        fields = (
-            "id",
-            "url",
-            "name",
-            "description",
-            "seller",
-            "created_date",
-        )
-
-
-class StoreDetailSerializer(serializers.HyperlinkedModelSerializer):
-    """JSON serializer for stores"""
-
-    seller = SellerSerializer(many=False)
     products = ProductSerializer(many=True)
 
     class Meta:
@@ -103,7 +85,7 @@ class Stores(ViewSet):
         try:
             store = Store.objects.get(pk=pk)
             store.products = Product.objects.filter(customer=store.seller)
-            serializer = StoreDetailSerializer(store, context={"request": request})
+            serializer = StoreSerializer(store, context={"request": request})
             return Response(serializer.data)
 
         except Store.DoesNotExist:
@@ -137,8 +119,12 @@ class Stores(ViewSet):
                 "seller": "http://localhost:8000/customers/5"
             }
         """
-        store = Store.objects.all()
-        serializer = StoreSerializer(store, context={"request": request}, many=True)
+        all_stores = Store.objects.all()
+        for store in all_stores:
+            store.products = Product.objects.filter(customer=store.seller)
+        serializer = StoreSerializer(
+            all_stores, context={"request": request}, many=True
+        )
         return Response(serializer.data)
 
     def create(self, request):
