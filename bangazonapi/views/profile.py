@@ -155,7 +155,6 @@ class Profile(ViewSet):
             favorites, many=True, context={"request": request}
         )
         return Response(serializer.data)
-    
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -209,9 +208,6 @@ class RecommenderSerializer(serializers.ModelSerializer):
             "product",
             "customer",
         )
-
-
-
 
 
 class ProfileSerializer(serializers.ModelSerializer):
