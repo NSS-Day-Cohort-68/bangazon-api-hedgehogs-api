@@ -3,10 +3,9 @@ from django.http import HttpResponseServerError
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from bangazonapi.models import Store, Customer, Product
+from bangazonapi.models import Store, Customer
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
-from .product import ProductSerializer
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -54,26 +53,6 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class StoreDetailSerializer(serializers.HyperlinkedModelSerializer):
-    """JSON serializer for stores"""
-
-    seller = SellerSerializer(many=False)
-    products = ProductSerializer(many=True)
-
-    class Meta:
-        model = Store
-        url = serializers.HyperlinkedIdentityField(view_name="store", lookup_field="id")
-        fields = (
-            "id",
-            "url",
-            "name",
-            "description",
-            "products",
-            "seller",
-            "created_date",
-        )
-
-
 class Stores(ViewSet):
     def retrieve(self, request, pk=None):
         """
@@ -102,8 +81,7 @@ class Stores(ViewSet):
         """
         try:
             store = Store.objects.get(pk=pk)
-            store.products = Product.objects.filter(customer=store.seller)
-            serializer = StoreDetailSerializer(store, context={"request": request})
+            serializer = StoreSerializer(store, context={"request": request})
             return Response(serializer.data)
 
         except Store.DoesNotExist:

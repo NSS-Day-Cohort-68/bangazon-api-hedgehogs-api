@@ -152,11 +152,22 @@ class Profile(ViewSet):
             customer = Customer.objects.get(user=request.auth.user)
             favorites = Favorite.objects.filter(customer=customer)
 
-        serializer = FavoriteSerializer(
-            favorites, many=True, context={"request": request}
-        )
-        return Response(serializer.data)
-    
+            serializer = FavoriteSerializer(
+                favorites, many=True, context={"request": request}
+            )
+            return Response(serializer.data)
+        
+        if request.method == "POST":
+            store = Store.objects.get(pk=request.data['store_id']) 
+            favorite = Favorite()
+            favorite.customer = Customer.objects.get(user=request.auth.user)
+            favorite.seller = store.seller
+            favorite.save()
+
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+        
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -210,6 +221,9 @@ class RecommenderSerializer(serializers.ModelSerializer):
             "product",
             "customer",
         )
+
+
+
 
 
 class ProfileSerializer(serializers.ModelSerializer):
