@@ -171,6 +171,7 @@ class Stores(ViewSet):
         new_store.description = request.data["description"]
         customer = Customer.objects.get(user=request.auth.user)
         new_store.seller = customer
+        new_store.products = Product.objects.filter(customer=new_store.seller)
         new_store.save()
 
         serializer = StoreSerializer(new_store, context={"request": request})
