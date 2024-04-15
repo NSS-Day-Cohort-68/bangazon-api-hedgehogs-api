@@ -39,6 +39,7 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for stores"""
 
     seller = SellerSerializer(many=False)
+    products = ProductSerializer(many=True)
 
     class Meta:
         model = Store
@@ -48,6 +49,7 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
             "url",
             "name",
             "description",
+            "products",
             "seller",
             "created_date",
         )
@@ -81,6 +83,7 @@ class Stores(ViewSet):
         """
         try:
             store = Store.objects.get(pk=pk)
+            store.products = Product.objects.filter(customer=store.seller)
             serializer = StoreSerializer(store, context={"request": request})
             return Response(serializer.data)
 
@@ -115,8 +118,12 @@ class Stores(ViewSet):
                 "seller": "http://localhost:8000/customers/5"
             }
         """
-        store = Store.objects.all()
-        serializer = StoreSerializer(store, context={"request": request}, many=True)
+        all_stores = Store.objects.all()
+        for store in all_stores:
+            store.products = Product.objects.filter(customer=store.seller)
+        serializer = StoreSerializer(
+            all_stores, context={"request": request}, many=True
+        )
         return Response(serializer.data)
 
     def create(self, request):
