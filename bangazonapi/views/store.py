@@ -6,7 +6,7 @@ from rest_framework import status
 from bangazonapi.models import Store, Customer
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
-
+from .product import ProductSerializer
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for Users
