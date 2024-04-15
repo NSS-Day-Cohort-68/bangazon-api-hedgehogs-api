@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from bangazonapi.models import Order, Customer, Product
 from bangazonapi.models import OrderProduct, Favorite
-from bangazonapi.models import Recommendation
+from bangazonapi.models import Recommendation, Store
 from .product import ProductSerializer
 
 # from .order import OrderSerializer
@@ -100,7 +100,7 @@ class Profile(ViewSet):
         except Exception as ex:
             return HttpResponseServerError(ex)
 
-    @action(methods=["get"], detail=False)
+    @action(methods=["get", "post"], detail=False)
     def favoritesellers(self, request):
         """
         @api {GET} /profile/favoritesellers GET favorite sellers
@@ -148,14 +148,26 @@ class Profile(ViewSet):
                 }
             ]
         """
-        customer = Customer.objects.get(user=request.auth.user)
-        favorites = Favorite.objects.filter(customer=customer)
+        if request.method == "GET":
+            customer = Customer.objects.get(user=request.auth.user)
+            favorites = Favorite.objects.filter(customer=customer)
 
-        serializer = FavoriteSerializer(
-            favorites, many=True, context={"request": request}
-        )
-        return Response(serializer.data)
-    
+            serializer = FavoriteSerializer(
+                favorites, many=True, context={"request": request}
+            )
+            return Response(serializer.data)
+        
+        if request.method == "POST":
+            store = Store.objects.get(pk=request.data['store_id']) 
+            favorite = Favorite()
+            favorite.customer = Customer.objects.get(user=request.auth.user)
+            favorite.seller = store.seller
+            favorite.save()
+
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+        
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
