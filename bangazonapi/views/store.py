@@ -3,11 +3,10 @@ from django.http import HttpResponseServerError
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from bangazonapi.models import Store, Customer, Product
+from bangazonapi.models import Store, Customer, Product, Favorite
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from .product import ProductSerializer
-
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for Users
@@ -50,9 +49,11 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
             "url",
             "name",
             "description",
+            "is_favorite",
             "products",
             "seller",
             "created_date",
+            
         )
         depth = 1
 
@@ -85,7 +86,13 @@ class Stores(ViewSet):
             }
         """
         try:
+            customer = Customer.objects.get(user=request.auth.user)
             store = Store.objects.get(pk=pk)
+            is_favorite = Favorite.objects.filter(customer=customer, seller=store.seller)
+            if len(is_favorite):
+                store.is_favorite = True
+            else:
+                store.is_favorite = False
             store.products = Product.objects.filter(customer=store.seller)
             serializer = StoreSerializer(store, context={"request": request})
             return Response(serializer.data)
