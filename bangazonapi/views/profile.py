@@ -100,7 +100,7 @@ class Profile(ViewSet):
         except Exception as ex:
             return HttpResponseServerError(ex)
 
-    @action(methods=["get", "post"], detail=False)
+    @action(methods=["get", "post", "delete"], detail=False)
     def favoritesellers(self, request):
         """
         @api {GET} /profile/favoritesellers GET favorite sellers
@@ -166,6 +166,14 @@ class Profile(ViewSet):
 
             return Response(None, status=status.HTTP_204_NO_CONTENT)
         
+        if request.method == "DELETE":
+            customer = Customer.objects.get(user=request.auth.user)
+            store = Store.objects.get(pk=request.data['store_id'])
+            favorite = Favorite.objects.filter(customer=customer, seller=store.seller)
+            favorite.delete()
+
+            return Response("seller successfully unfavorited", status=status.HTTP_204_NO_CONTENT)
+
         return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
