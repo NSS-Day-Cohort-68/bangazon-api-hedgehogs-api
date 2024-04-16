@@ -23,3 +23,11 @@ class Customer(models.Model):
     @recommended_by.setter
     def recommended_by(self, value):
         self.__recommended_by = value
+
+    @property
+    def store(self):
+        return self.__store
+    
+    @store.setter
+    def store(self, value):
+        self.__store = value
