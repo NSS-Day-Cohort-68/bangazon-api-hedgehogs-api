@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from bangazonapi.models import Order, Customer, Product, Store
+from bangazonapi.models import Order, Customer, Product, Like, Store
 from bangazonapi.models import OrderProduct, Favorite
 from bangazonapi.models import Recommendation, Store
 from .product import ProductSerializer
@@ -244,7 +244,19 @@ class ProfileStoreSerializer(serializers.ModelSerializer):
         )
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    """JSON serializer for recommendations"""
 
+    customer = CustomerSerializer()
+    product = ProfileProductSerializer()
+
+    class Meta:
+        model = Like
+        fields = (
+            "id",
+            "product",
+            "customer",
+        )
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -256,6 +268,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(many=False)
     recommends = RecommenderSerializer(many=True)
+    liked_products = LikeSerializer(many=True, source="likes")
     recommended_by = RecommenderSerializer(many=True)
     store = ProfileStoreSerializer(many=True)
 
@@ -269,6 +282,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "address",
             "payment_types",
             "recommends",
+            "liked_products",
             "recommended_by",
             "store",
         )
