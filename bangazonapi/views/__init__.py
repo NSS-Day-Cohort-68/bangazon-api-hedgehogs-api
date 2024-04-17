@@ -10,3 +10,4 @@ from .lineitem import LineItems
 from .customer import Customers
 from .user import Users
 from .report import Reports
+from .store import Stores

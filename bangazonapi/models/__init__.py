@@ -9,3 +9,4 @@ from .rating import Rating
 from .favorite import Favorite
 from .productrating import ProductRating
 from .like import Like
+from .store import Store
