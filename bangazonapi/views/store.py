@@ -55,6 +55,8 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
             "created_date",
             
         )
+        depth = 1
+
 
 
 class Stores(ViewSet):
